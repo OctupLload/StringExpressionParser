@@ -8,95 +8,72 @@ import java.text.ParseException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class StringParserTest {
+class StringParserTest {
     @Nested
     class EvaluateTest {
         @Test
-        public void evaluateWithAdd() throws ParseException {
-            String expression = "2 +2";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithAdd() throws ParseException {
+            StringParser stringParser = new StringParser("2 +2");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 4.0;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат при сложении").isEqualTo(4.0);
         }
 
         @Test
-        public void evaluateWithSubstract() throws ParseException {
-            String expression = "20- 4";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithSubstract() throws ParseException {
+            StringParser stringParser = new StringParser("20- 4");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 16.0;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат при вычитании").isEqualTo(16.0);
         }
 
         @Test
-        public void evaluateWithAddAndSubstract() throws ParseException {
-            String expression = "20- 4 + 5 - 10";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithAddAndSubstract() throws ParseException {
+            StringParser stringParser = new StringParser("20- 4 + 5 - 10");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 11.0;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат при сложении и вычитании").isEqualTo(11.0);
         }
 
         @Test
-        public void evaluateWithMultiply() throws ParseException {
-            String expression = "5 * 2 *9";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithMultiply() throws ParseException {
+            StringParser stringParser = new StringParser("5 * 2 *9");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 90.0;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат при умножении").isEqualTo(90.0);
         }
 
         @Test
-        public void evaluateWithDivide() throws ParseException {
-            String expression = "13 / 4 ";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithDivide() throws ParseException {
+            StringParser stringParser = new StringParser("13 / 4 ");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 3.25;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат при делении").isEqualTo(3.25);
         }
 
         @Test
-        public void evaluateWithMultiplyAndDivide() throws ParseException {
-            String expression = "15*20/2 ";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithMultiplyAndDivide() throws ParseException {
+            StringParser stringParser = new StringParser("15*20/2 ");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 150.0;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат умножении и делении").isEqualTo(150.0);
         }
 
         @Test
-        public void evaluateWithBrackets() throws ParseException {
-            String expression = "(2 + 2) * 2";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithBrackets() throws ParseException {
+            StringParser stringParser = new StringParser("(2 + 2) * 2");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 8.0;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат при наличии скобок").isEqualTo(8.0);
         }
 
         @Test
-        public void evaluateWithAllOperators() throws ParseException {
-            String expression = "24/ 4 *5-(17-9)";
-
-            StringParser stringParser = new StringParser(expression);
+        void evaluateWithAllOperators() throws ParseException {
+            StringParser stringParser = new StringParser("24/ 4 *5-(17-9)");
             double actualResult = stringParser.getExpressionResult();
-            double expectedResult = 22.0;
 
-            assertThat(actualResult).isEqualTo(expectedResult);
+            assertThat(actualResult).as("Неверный результат при использовании всех операторов и скобок")
+                                    .isEqualTo(22.0);
         }
     }
 
@@ -104,46 +81,46 @@ public class StringParserTest {
     class ErrorTest {
         @Test
         public void noExpressionError() {
-            String expression = " ";
-
-            StringParser stringParser = new StringParser(expression);
+            StringParser stringParser = new StringParser(" ");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
+            assertThat(actualException).as("Исключение не сгенерировано").isNotNull();
             assertThat(actualException).isInstanceOf(ParseException.class);
-            assertThat(actualException.getMessage()).isEqualTo("Отсутствует выражение");
+            assertThat(actualException.getMessage()).as("Задано выражение для вычисления")
+                                                    .isEqualTo("Отсутствует выражение");
         }
 
         @Test
         public void bracketError() {
-            String expression = "2 * (2 + 2";
-
-            StringParser stringParser = new StringParser(expression);
+            StringParser stringParser = new StringParser("2 * (2 + 2");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
+            assertThat(actualException).as("Исключение не сгенерировано").isNotNull();
             assertThat(actualException).isInstanceOf(ParseException.class);
-            assertThat(actualException.getMessage()).isEqualTo("Отсутствует скобка");
+            assertThat(actualException.getMessage()).as("Количество открывающих скобок равно закрывающим")
+                                                    .isEqualTo("Отсутствует скобка");
         }
 
         @Test
         public void divisionByZeroError() {
-            String expression = "10 * 2 / 0";
-
-            StringParser stringParser = new StringParser(expression);
+            StringParser stringParser = new StringParser("10 * 2 / 0");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
+            assertThat(actualException).as("Исключение не сгенерировано").isNotNull();
             assertThat(actualException).isInstanceOf(ParseException.class);
-            assertThat(actualException.getMessage()).isEqualTo("Обнаружено деление на ноль");
+            assertThat(actualException.getMessage()).as("Отсутствует деление на 0")
+                                                    .isEqualTo("Обнаружено деление на ноль");
         }
 
         @Test
         public void syntaxError() {
-            String expression = "2 ++ 4";
-
-            StringParser stringParser = new StringParser(expression);
+            StringParser stringParser = new StringParser("2 ++ 4");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
+            assertThat(actualException).as("Исключение не сгенерировано").isNotNull();
             assertThat(actualException).isInstanceOf(ParseException.class);
-            assertThat(actualException.getMessage()).isEqualTo("Синтаксическая ошибка");
+            assertThat(actualException.getMessage()).as("С синтаксисом выражения все впорядке")
+                                                    .isEqualTo("Синтаксическая ошибка");
         }
     }
 }
