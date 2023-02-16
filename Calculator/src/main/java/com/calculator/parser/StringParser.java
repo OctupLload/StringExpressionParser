@@ -1,7 +1,11 @@
 package com.calculator.parser;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Класс рекурсивно-последовательного синтаксического анализа выражения,
@@ -199,7 +203,7 @@ public class StringParser {
      * @return возвращает true, если символ является разделителем
      */
     private boolean isDelimiter(char character) {
-        List<Character> delimiters = new ArrayList<>(Arrays.asList('+', '-', '/', '*', '(', ')'));
+        ArrayList<Character> delimiters = new ArrayList<>(Arrays.asList('+', '-', '/', '*', '(', ')'));
 
         return delimiters.contains(character);
     }
