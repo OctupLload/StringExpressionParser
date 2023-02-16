@@ -75,12 +75,21 @@ class StringParserTest {
             assertThat(actualResult).as("Неверный результат при использовании всех операторов и скобок")
                                     .isEqualTo(22.0);
         }
+
+        @Test
+        void evaluateWithVariables() throws ParseException {
+            StringParser stringParser = new StringParser("2+x1*(x2-5*x3)/60", new Integer[]{5, 6, 7});
+            double actualResult = stringParser.getExpressionResult();
+
+            assertThat(actualResult).as("Неверный результат при подставленных значениях переменных")
+                                    .isEqualTo(-0.42);
+        }
     }
 
     @Nested
     class ErrorTest {
         @Test
-        public void noExpressionError() {
+        void noExpressionError() {
             StringParser stringParser = new StringParser(" ");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
@@ -91,7 +100,7 @@ class StringParserTest {
         }
 
         @Test
-        public void bracketError() {
+        void bracketError() {
             StringParser stringParser = new StringParser("2 * (2 + 2");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
@@ -102,7 +111,7 @@ class StringParserTest {
         }
 
         @Test
-        public void divisionByZeroError() {
+        void divisionByZeroError() {
             StringParser stringParser = new StringParser("10 * 2 / 0");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
@@ -113,7 +122,7 @@ class StringParserTest {
         }
 
         @Test
-        public void syntaxError() {
+        void syntaxError() {
             StringParser stringParser = new StringParser("2 ++ 4");
             Throwable actualException = catchThrowable(stringParser::getExpressionResult);
 
@@ -121,6 +130,28 @@ class StringParserTest {
             assertThat(actualException).isInstanceOf(ParseException.class);
             assertThat(actualException.getMessage()).as("С синтаксисом выражения все впорядке")
                                                     .isEqualTo("Синтаксическая ошибка");
+        }
+
+        @Test
+        void variableDetectedError() {
+            StringParser stringParser = new StringParser("(25 +3) * x1");
+            Throwable actualException = catchThrowable(stringParser::getExpressionResult);
+
+            assertThat(actualException).as("Исключение не сгенерировано").isNotNull();
+            assertThat(actualException).isInstanceOf(ParseException.class);
+            assertThat(actualException.getMessage()).as("Переменных не обнаружено")
+                                                    .isEqualTo("Обнаружена переменная без значения");
+        }
+
+        @Test
+        void incorrectValuesQuantityError() {
+            StringParser stringParser = new StringParser("x1 + 25 *x2", new Integer[]{2});
+            Throwable actualException = catchThrowable(stringParser::getExpressionResult);
+
+            assertThat(actualException).as("Исключение не сгенерировано").isNotNull();
+            assertThat(actualException).isInstanceOf(ParseException.class);
+            assertThat(actualException.getMessage()).as("Количество значений равно количеству переменных")
+                                      .isEqualTo("Количество значений не равно количеству переменных");
         }
     }
 }

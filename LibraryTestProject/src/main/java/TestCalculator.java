@@ -5,8 +5,7 @@ import java.text.ParseException;
 public class TestCalculator {
     public static void main(String[] args) {
         double stringResult;
-        StringParser stringParser = new StringParser("(25 + 5) * 10 / 32");
-
+        StringParser stringParser = new StringParser("(25 + x1) * 10 / x2", new Integer[]{5, 32});
         try {
             stringResult = stringParser.getExpressionResult();
             System.out.println("Результат вычисления: " + stringResult);

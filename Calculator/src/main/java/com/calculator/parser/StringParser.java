@@ -1,14 +1,12 @@
 package com.calculator.parser;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Класс рекурсивно-последовательного синтаксического анализа выражения,
  * которое представлено в форме строки
- * @version 1.0
+ * @version 1.1
  */
 public class StringParser {
 
@@ -19,6 +17,7 @@ public class StringParser {
     private final String DELIMITER = "DELIMITER";
     private final String NUMBER = "NUMBER";
     private final String EOE = "EOE";
+    private final String VARIABLE = "VARIABLE";
 
     /**
      * Типы возможных ошибок
@@ -26,7 +25,9 @@ public class StringParser {
     private final String SYNTAX_ERROR = "Синтаксическая ошибка";
     private final String BRACKET_ERROR = "Отсутствует скобка";
     private final String NO_EXPRESSION_ERROR = "Отсутствует выражение";
-    private final String DIVISION_BY_ZERO_ERROR ="Обнаружено деление на ноль";
+    private final String DIVISION_BY_ZERO_ERROR = "Обнаружено деление на ноль";
+    private final String VARIABLE_DETECTED_ERROR = "Обнаружена переменная без значения";
+    private final String INCORRECT_VALUES_QUANTITY_ERROR = "Количество значений не равно количеству переменных";
 
     /**
      * Выражение в виде строки
@@ -49,11 +50,27 @@ public class StringParser {
     private String lexemeType;
 
     /**
+     * Значения переменных для подстановки
+     */
+    private Integer[] variablesValue;
+
+    /**
      * Конструктор - создание нового объекта с определенным значением
      * @param expression строковое выражение
      */
     public StringParser(String expression) {
         this.expression = expression;
+    }
+
+    /**
+     * Конструктор - создание нового объекта с определенным выражением,
+     * которое содержит переменные, а так же с набором значений для подстановки
+     * @param expression строковое выражение
+     * @param variablesValue значение переменных для подстановки
+     */
+    public StringParser(String expression, Integer[] variablesValue) {
+        this.expression = expression;
+        this.variablesValue = variablesValue;
     }
 
     /**
@@ -65,6 +82,9 @@ public class StringParser {
     public double getExpressionResult() throws ParseException {
         double result;
         this.expression = expression.replaceAll("\\s+", "");
+        if (variablesValue != null) {
+            setVariablesValueToExpression(expression, variablesValue);
+        }
         getLexeme();
         if (lexeme.equals(EOE)) {
             handleError(NO_EXPRESSION_ERROR);
@@ -73,7 +93,7 @@ public class StringParser {
         if (!lexeme.equals(EOE)) {
             handleError(SYNTAX_ERROR);
         }
-        return result;
+        return (double) Math.round(result * 100.0) / 100.0;
     }
 
     /**
@@ -90,14 +110,11 @@ public class StringParser {
         while (((operator = lexeme.charAt(0)) == '+') || operator == '-') {
             getLexeme();
             partialResult = multiplyOrDivideTwoFactors();
-            switch (operator) {
-                case '-':
-                    result = result - partialResult;
-                    break;
-                case '+':
-                    result = result + partialResult;
-                    break;
-            }
+            result = switch (operator) {
+                case '-' -> result - partialResult;
+                case '+' -> result + partialResult;
+                default -> result;
+            };
         }
         return result;
     }
@@ -118,14 +135,12 @@ public class StringParser {
             getLexeme();
             partialResult = evaluateInsideBrackets();
             switch (operator) {
-                case '*':
-                    result = result * partialResult;
-                    break;
-                case '/':
-                    if(partialResult == 0.0)
+                case '*' -> result = result * partialResult;
+                case '/' -> {
+                    if (partialResult == 0.0)
                         handleError(DIVISION_BY_ZERO_ERROR);
                     result = result / partialResult;
-                    break;
+                }
             }
         }
         return result;
@@ -168,7 +183,11 @@ public class StringParser {
                 handleError(SYNTAX_ERROR);
             }
             getLexeme();
-        } else {
+        }
+        else if (lexemeType.equals(VARIABLE)) {
+            handleError(VARIABLE_DETECTED_ERROR);
+        }
+        else {
             handleError(SYNTAX_ERROR);
         }
         return result;
@@ -214,13 +233,55 @@ public class StringParser {
             while(!isDelimiter(expression.charAt(currentIndex))){
                 lexeme += expression.charAt(currentIndex);
                 currentIndex++;
-                if(currentIndex >= expression.length())
+                if(currentIndex >= expression.length()) {
                     break;
+                }
             }
             lexemeType = NUMBER;
         }
+        else if (Character.isLetter(expression.charAt(currentIndex))) {
+            while(!isDelimiter(expression.charAt(currentIndex))) {
+                lexeme += expression.charAt(currentIndex);
+                currentIndex++;
+                if(currentIndex >= expression.length()) {
+                    break;
+                }
+            }
+            lexemeType = VARIABLE;
+        }
         else {
             lexeme = EOE;
+        }
+    }
+
+    /**
+     * Установка значений переменных вместо переменных в выражение
+     * @param expression строковое выражение
+     * @param variablesValue значение переменных для подстановки
+     * @throws ParseException если количество значений не равно количеству переменных
+     */
+    private void setVariablesValueToExpression(String expression, Integer[] variablesValue) throws ParseException {
+        String replacedExpression = expression;
+        Queue<Integer> variablesValueQueue = new LinkedList<>();
+        Collections.addAll(variablesValueQueue, variablesValue);
+
+        while(true) {
+            getLexeme();
+            if (lexemeType.equals(VARIABLE)) {
+                if (variablesValueQueue.peek() != null) {
+                    replacedExpression = replacedExpression.replaceAll(lexeme, Integer.toString(variablesValueQueue.poll()));
+                }
+                else {
+                    handleError(INCORRECT_VALUES_QUANTITY_ERROR);
+                }
+            }
+            else if (lexeme.equals(EOE)) {
+                this.expression = replacedExpression;
+                lexeme = "";
+                lexemeType = "";
+                currentIndex = 0;
+                break;
+            }
         }
     }
 }
