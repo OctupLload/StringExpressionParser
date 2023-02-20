@@ -1,32 +1,39 @@
 package com.calculator.parser;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Класс рекурсивно-последовательного синтаксического анализа выражения,
  * которое представлено в форме строки
- * @version 1.0
+ * @version 1.1
  */
 public class StringParser {
 
     /**
      * Типы лексем
      */
-    private final String NONE = "NONE";
-    private final String DELIMITER = "DELIMITER";
-    private final String NUMBER = "NUMBER";
-    private final String EOE = "EOE";
+    private static final String NONE = "NONE";
+    private static final String DELIMITER = "DELIMITER";
+    private static final String NUMBER = "NUMBER";
+    private static final String EOE = "EOE";
+    private static final String VARIABLE = "VARIABLE";
 
     /**
      * Типы возможных ошибок
      */
-    private final String SYNTAX_ERROR = "Синтаксическая ошибка";
-    private final String BRACKET_ERROR = "Отсутствует скобка";
-    private final String NO_EXPRESSION_ERROR = "Отсутствует выражение";
-    private final String DIVISION_BY_ZERO_ERROR ="Обнаружено деление на ноль";
+    private static final String SYNTAX_ERROR = "Синтаксическая ошибка";
+    private static final String BRACKET_ERROR = "Отсутствует скобка";
+    private static final String NO_EXPRESSION_ERROR = "Отсутствует выражение";
+    private static final String DIVISION_BY_ZERO_ERROR = "Обнаружено деление на ноль";
+    private static final String VARIABLE_DETECTED_ERROR = "Обнаружена переменная без значения";
+    private static final String INCORRECT_VALUES_QUANTITY_ERROR = "Количество значений меньше количества переменных";
+    private static final String INCORRECT_VARIABLES_QUANTITY_ERROR = "Количество значений больше количества переменных";
+
+    /**
+     * Список математических символов, которые являются разделителями
+     */
+    private static final List<Character> delimiters = Arrays.asList('+', '-', '/', '*', '(', ')');
 
     /**
      * Выражение в виде строки
@@ -57,26 +64,6 @@ public class StringParser {
     }
 
     /**
-     * Вычисление значения выражения, которое представлено в форме строки
-     * @return результат вычисления выражения
-     * @throws ParseException если не передано выражение, деление на ноль,
-     * отсутствие скобки или другая синтаксическая ошибка
-     */
-    public double getExpressionResult() throws ParseException {
-        double result;
-        this.expression = expression.replaceAll("\\s+", "");
-        getLexeme();
-        if (lexeme.equals(EOE)) {
-            handleError(NO_EXPRESSION_ERROR);
-        }
-        result = addOrSubtractTwoTerms();
-        if (!lexeme.equals(EOE)) {
-            handleError(SYNTAX_ERROR);
-        }
-        return result;
-    }
-
-    /**
      * Сложить или вычесть два терма
      * @return результат сложения или вычитания двух термов
      * @throws ParseException если не передано выражение, деление на ноль,
@@ -90,14 +77,11 @@ public class StringParser {
         while (((operator = lexeme.charAt(0)) == '+') || operator == '-') {
             getLexeme();
             partialResult = multiplyOrDivideTwoFactors();
-            switch (operator) {
-                case '-':
-                    result = result - partialResult;
-                    break;
-                case '+':
-                    result = result + partialResult;
-                    break;
-            }
+            result = switch (operator) {
+                case '-' -> result - partialResult;
+                case '+' -> result + partialResult;
+                default -> result;
+            };
         }
         return result;
     }
@@ -118,14 +102,12 @@ public class StringParser {
             getLexeme();
             partialResult = evaluateInsideBrackets();
             switch (operator) {
-                case '*':
-                    result = result * partialResult;
-                    break;
-                case '/':
-                    if(partialResult == 0.0)
+                case '*' -> result = result * partialResult;
+                case '/' -> {
+                    if (partialResult == 0.0)
                         handleError(DIVISION_BY_ZERO_ERROR);
                     result = result / partialResult;
-                    break;
+                }
             }
         }
         return result;
@@ -168,7 +150,11 @@ public class StringParser {
                 handleError(SYNTAX_ERROR);
             }
             getLexeme();
-        } else {
+        }
+        else if (lexemeType.equals(VARIABLE)) {
+            handleError(VARIABLE_DETECTED_ERROR);
+        }
+        else {
             handleError(SYNTAX_ERROR);
         }
         return result;
@@ -180,8 +166,6 @@ public class StringParser {
      * @return возвращает true, если символ является разделителем
      */
     private boolean isDelimiter(char character) {
-        List<Character> delimiters = new ArrayList<>(Arrays.asList('+', '-', '/', '*', '(', ')'));
-
         return delimiters.contains(character);
     }
 
@@ -210,17 +194,84 @@ public class StringParser {
             currentIndex++;
             lexemeType = DELIMITER;
         }
-        else if(Character.isDigit(expression.charAt(currentIndex))){
-            while(!isDelimiter(expression.charAt(currentIndex))){
+        else if(Character.isDigit(expression.charAt(currentIndex))) {
+            while(!isDelimiter(expression.charAt(currentIndex))) {
                 lexeme += expression.charAt(currentIndex);
                 currentIndex++;
-                if(currentIndex >= expression.length())
+                if(currentIndex >= expression.length()) {
                     break;
+                }
             }
             lexemeType = NUMBER;
         }
+        else if (Character.isLetter(expression.charAt(currentIndex))) {
+            while(!isDelimiter(expression.charAt(currentIndex))) {
+                lexeme += expression.charAt(currentIndex);
+                currentIndex++;
+                if(currentIndex >= expression.length()) {
+                    break;
+                }
+            }
+            lexemeType = VARIABLE;
+        }
         else {
             lexeme = EOE;
+        }
+    }
+
+    /**
+     * Вычисление значения выражения, которое представлено в форме строки
+     * @return результат вычисления выражения
+     * @throws ParseException если не передано выражение, деление на ноль,
+     * отсутствие скобки или другая синтаксическая ошибка
+     */
+    public double getExpressionResult() throws ParseException {
+        double result;
+        this.expression = expression.replaceAll("\\s+", "");
+        getLexeme();
+        if (lexeme.equals(EOE)) {
+            handleError(NO_EXPRESSION_ERROR);
+        }
+        result = addOrSubtractTwoTerms();
+        if (!lexeme.equals(EOE)) {
+            handleError(SYNTAX_ERROR);
+        }
+        return (double) Math.round(result * 100.0) / 100.0;
+    }
+
+    /**
+     * Установка переданных значений вместо переменных
+     * @param variablesValue значения переменных для подстановки
+     * @throws ParseException если количество значений больше или меньше количества переменных
+     */
+    public void setVariablesValue(Integer... variablesValue) throws ParseException {
+        this.expression = expression.replaceAll("\\s+", "");
+        String expressionWithSetedValues = expression;
+        Queue<Integer> variablesValueQueue = new LinkedList<>();
+        Collections.addAll(variablesValueQueue, variablesValue);
+
+        while(true) {
+            getLexeme();
+            if (lexemeType.equals(VARIABLE)) {
+                if (variablesValueQueue.peek() != null) {
+                    expressionWithSetedValues = expressionWithSetedValues.replaceFirst(lexeme, Integer.toString(variablesValueQueue.poll()));
+                }
+                else {
+                    handleError(INCORRECT_VALUES_QUANTITY_ERROR);
+                }
+            }
+            else if (lexeme.equals(EOE)) {
+                if (variablesValueQueue.peek() == null) {
+                    this.expression = expressionWithSetedValues;
+                    lexeme = "";
+                    lexemeType = "";
+                    currentIndex = 0;
+                    break;
+                }
+                else {
+                    handleError(INCORRECT_VARIABLES_QUANTITY_ERROR);
+                }
+            }
         }
     }
 }
