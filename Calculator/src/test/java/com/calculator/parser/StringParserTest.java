@@ -78,11 +78,12 @@ class StringParserTest {
 
         @Test
         void evaluateWithVariables() throws ParseException {
-            StringParser stringParser = new StringParser("2+x1*(x2-5*x3)/60");
+            StringParser stringParser = new StringParser("x1 / 3 + (22 + x2)");
+            stringParser.setVariablesValue(3, 4);
             double actualResult = stringParser.getExpressionResult();
 
-            assertThat(actualResult).as("Неверный результат при подставленных значениях переменных")
-                                    .isEqualTo(-0.42);
+            assertThat(actualResult).as("Неверный результат при подстановке значений переменных")
+                                    .isEqualTo(27.0);
         }
     }
 
@@ -140,18 +141,29 @@ class StringParserTest {
             assertThat(actualException).as("Исключение не сгенерировано").isNotNull()
                                        .isInstanceOf(ParseException.class)
                                        .as("Переменных не обнаружено")
-                                       .isEqualTo("Обнаружена переменная без значения");
+                                       .hasMessage("Обнаружена переменная без значения");
         }
 
         @Test
         void incorrectValuesQuantityError() {
             StringParser stringParser = new StringParser("x1 + 25 *x2");
-            Throwable actualException = catchThrowable(stringParser::getExpressionResult);
+            Throwable actualException = catchThrowable(() -> stringParser.setVariablesValue(1));
 
             assertThat(actualException).as("Исключение не сгенерировано").isNotNull()
                                        .isInstanceOf(ParseException.class)
-                                       .as("Количество значений равно количеству переменных")
-                                       .hasMessage("Количество значений не равно количеству переменных");
+                                       .as("Количество значений больше количества переменных")
+                                       .hasMessage("Количество значений меньше количества переменных");
+        }
+
+        @Test
+        void incorrectVariablesQuantityError() {
+            StringParser stringParser = new StringParser("x1 + 25 *x2");
+            Throwable actualException = catchThrowable(() -> stringParser.setVariablesValue(4, 5, 6));
+
+            assertThat(actualException).as("Исключение не сгенерировано").isNotNull()
+                                       .isInstanceOf(ParseException.class)
+                                       .as("Количество значений меньше количества переменных")
+                                       .hasMessage("Количество значений больше количества переменных");
         }
     }
 }

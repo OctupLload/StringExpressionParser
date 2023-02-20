@@ -31,7 +31,8 @@ public class StringParser {
     private static final String NO_EXPRESSION_ERROR = "Отсутствует выражение";
     private static final String DIVISION_BY_ZERO_ERROR = "Обнаружено деление на ноль";
     private static final String VARIABLE_DETECTED_ERROR = "Обнаружена переменная без значения";
-    private static final String INCORRECT_VALUES_QUANTITY_ERROR = "Количество значений не равно количеству переменных";
+    private static final String INCORRECT_VALUES_QUANTITY_ERROR = "Количество значений меньше количества переменных";
+    private static final String INCORRECT_VARIABLES_QUANTITY_ERROR = "Количество значений больше количества переменных";
 
     /**
      * Список математических символов, которые являются разделителями
@@ -242,7 +243,12 @@ public class StringParser {
         return (double) Math.round(result * 100.0) / 100.0;
     }
 
-    public void setVariablesValue(Integer... variablesValue) throws ParseException{
+    /**
+     * Установка переданных значений вместо переменных
+     * @param variablesValue значения переменных для подстановки
+     * @throws ParseException если количество значений больше или меньше количества переменных
+     */
+    public void setVariablesValue(Integer... variablesValue) throws ParseException {
         this.expression = expression.replaceAll("\\s+", "");
         String expressionWithSetedValues = expression;
         Queue<Integer> variablesValueQueue = new LinkedList<>();
@@ -252,18 +258,23 @@ public class StringParser {
             getLexeme();
             if (lexemeType.equals(VARIABLE)) {
                 if (variablesValueQueue.peek() != null) {
-                    expressionWithSetedValues = expressionWithSetedValues.replaceAll(lexeme, Integer.toString(variablesValueQueue.poll()));
+                    expressionWithSetedValues = expressionWithSetedValues.replaceFirst(lexeme, Integer.toString(variablesValueQueue.poll()));
                 }
                 else {
                     handleError(INCORRECT_VALUES_QUANTITY_ERROR);
                 }
             }
             else if (lexeme.equals(EOE)) {
-                this.expression = expressionWithSetedValues;
-                lexeme = "";
-                lexemeType = "";
-                currentIndex = 0;
-                break;
+                if (variablesValueQueue.peek() == null) {
+                    this.expression = expressionWithSetedValues;
+                    lexeme = "";
+                    lexemeType = "";
+                    currentIndex = 0;
+                    break;
+                }
+                else {
+                    handleError(INCORRECT_VARIABLES_QUANTITY_ERROR);
+                }
             }
         }
     }
