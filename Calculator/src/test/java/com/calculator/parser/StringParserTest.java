@@ -85,6 +85,16 @@ class StringParserTest {
             assertThat(actualResult).as("Неверный результат при подстановке значений переменных")
                                     .isEqualTo(27.0);
         }
+
+        @Test
+        void evaluateWithUnaryOperator() throws ParseException {
+            StringParser stringParser = new StringParser("-x1 * 5 * (2 - -4)");
+            stringParser.setVariablesValue(2);
+            double actualResult = stringParser.getExpressionResult();
+
+            assertThat(actualResult).as("Неверный результат при использовании унарного оператора")
+                                    .isEqualTo(-60.0);
+        }
     }
 
     @Nested
