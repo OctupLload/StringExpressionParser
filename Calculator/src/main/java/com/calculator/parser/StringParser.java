@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Класс рекурсивно-последовательного синтаксического анализа выражения,
  * которое представлено в форме строки
- * @version 1.3
+ * @version 1.4
  */
 public class StringParser {
 
@@ -36,6 +36,11 @@ public class StringParser {
     private static final List<Character> delimiters = Arrays.asList('+', '-', '/', '*', '(', ')');
 
     /**
+     * Список допустимых математических функций, которые могут находиться в выражении
+     */
+    private static final List<String> mathFunctions = Arrays.asList("tan", "sin", "cos");
+
+    /**
      * Выражение в виде строки
      */
     private String expression;
@@ -59,6 +64,11 @@ public class StringParser {
      * Унарная операция
      */
     private char unaryOperator;
+
+    /**
+     * Результат вычисления функции
+     */
+    private double functionValue;
 
     /**
      * Конструктор - создание нового объекта с определенным значением
@@ -234,11 +244,45 @@ public class StringParser {
                     break;
                 }
             }
-            lexemeType = VARIABLE;
+            if (mathFunctions.contains(lexeme) && expression.charAt(currentIndex) == '(') {
+                while(!(expression.charAt(currentIndex) == ')')) {
+                    lexeme += expression.charAt(currentIndex);
+                    currentIndex++;
+                }
+                lexeme += expression.charAt(currentIndex);
+                lexeme = replaceFunction(lexeme);
+                lexemeType = NUMBER;
+            }
+            else {
+                lexemeType = VARIABLE;
+            }
         }
         else {
             lexeme = EOE;
         }
+    }
+
+    /**
+     * Замена функции в выражении на результат ее вычесления
+     * @param lexeme функция для вычисления и замены
+     * @return результат вычисления функции
+     */
+    private String replaceFunction(String lexeme) {
+        String functionName = lexeme.substring(0, lexeme.indexOf('('));
+        String functionArgument = lexeme.substring(lexeme.indexOf('(') + 1, lexeme.indexOf(')'));
+
+        switch (functionName) {
+            case "tan" -> functionValue = Math.tan(Double.parseDouble(functionArgument));
+            case "sin" -> functionValue = Math.sin(Double.parseDouble(functionArgument));
+            case "cos" -> functionValue = Math.cos(Double.parseDouble(functionArgument));
+        }
+
+        functionValue = (double) Math.round(functionValue * 100) / 100;
+        this.expression = expression.replace(lexeme, Double.toString(functionValue));
+
+        this.currentIndex = currentIndex - (lexeme.length() - Double.toString(functionValue).length()) + 1;
+
+        return Double.toString(functionValue);
     }
 
     /**
