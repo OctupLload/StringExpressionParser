@@ -95,6 +95,16 @@ class StringParserTest {
             assertThat(actualResult).as("Неверный результат при использовании унарного оператора")
                                     .isEqualTo(-60.0);
         }
+
+        @Test
+        void evaluateWithMathFunctions() throws ParseException {
+            StringParser stringParser = new StringParser("cos(10) + 2 - sin(3)");
+
+            double actualResult = stringParser.getExpressionResult();
+
+            assertThat(actualResult).as("Неверный результат при наличии математической функции")
+                                    .isEqualTo(1.02);
+        }
     }
 
     @Nested
