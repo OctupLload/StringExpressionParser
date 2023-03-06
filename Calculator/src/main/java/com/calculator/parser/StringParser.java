@@ -1,7 +1,10 @@
 package com.calculator.parser;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Класс рекурсивно-последовательного синтаксического анализа выражения,
@@ -33,12 +36,12 @@ public class StringParser {
     /**
      * Список математических символов, которые являются разделителями
      */
-    private static final List<Character> delimiters = Arrays.asList('+', '-', '/', '*', '(', ')');
+    private static final List<Character> delimiters = List.of('+', '-', '/', '*', '(', ')');
 
     /**
      * Список допустимых математических функций, которые могут находиться в выражении
      */
-    private static final List<String> mathFunctions = Arrays.asList("tan", "sin", "cos");
+    private static final List<String> mathFunctions = List.of("tan", "sin", "cos");
 
     /**
      * Выражение в виде строки
