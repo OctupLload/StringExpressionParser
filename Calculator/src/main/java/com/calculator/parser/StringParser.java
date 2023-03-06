@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Класс рекурсивно-последовательного синтаксического анализа выражения,
  * которое представлено в форме строки
- * @version 1.1
+ * @version 1.3
  */
 public class StringParser {
 
@@ -56,6 +56,11 @@ public class StringParser {
     private String lexemeType;
 
     /**
+     * Унарная операция
+     */
+    private char unaryOperator;
+
+    /**
      * Конструктор - создание нового объекта с определенным значением
      * @param expression строковое выражение
      */
@@ -97,7 +102,7 @@ public class StringParser {
         double result;
         double partialResult;
         result = evaluateInsideBrackets();
-        while((operator = lexeme.charAt(0)) == '*' ||
+        while ((operator = lexeme.charAt(0)) == '*' ||
                 operator == '/') {
             getLexeme();
             partialResult = evaluateInsideBrackets();
@@ -121,10 +126,10 @@ public class StringParser {
      */
     private double evaluateInsideBrackets() throws ParseException {
         double result;
-        if(lexeme.equals("(")) {
+        if (lexeme.equals("(")) {
             getLexeme();
             result = addOrSubtractTwoTerms();
-            if(!lexeme.equals(")")) {
+            if (!lexeme.equals(")")) {
                 handleError(BRACKET_ERROR);
             }
             getLexeme();
@@ -190,25 +195,42 @@ public class StringParser {
             return;
         }
         if (isDelimiter(expression.charAt(currentIndex))) {
-            lexeme += expression.charAt(currentIndex);
-            currentIndex++;
-            lexemeType = DELIMITER;
-        }
-        else if(Character.isDigit(expression.charAt(currentIndex))) {
-            while(!isDelimiter(expression.charAt(currentIndex))) {
+            if (currentIndex == 0 && expression.charAt(currentIndex) == '-') {
+                unaryOperator = expression.charAt(currentIndex);
+                currentIndex++;
+                getLexeme();
+            }
+            else if (currentIndex != 0 && isDelimiter(expression.charAt(currentIndex - 1)) &&
+                     expression.charAt(currentIndex) == '-') {
+                unaryOperator = expression.charAt(currentIndex);
+                currentIndex++;
+                getLexeme();
+            }
+            else {
                 lexeme += expression.charAt(currentIndex);
                 currentIndex++;
-                if(currentIndex >= expression.length()) {
+                lexemeType = DELIMITER;
+            }
+        }
+        else if (Character.isDigit(expression.charAt(currentIndex))) {
+            if (unaryOperator == '-') {
+                lexeme += unaryOperator;
+            }
+            while (!isDelimiter(expression.charAt(currentIndex))) {
+                lexeme += expression.charAt(currentIndex);
+                currentIndex++;
+                if (currentIndex >= expression.length()) {
                     break;
                 }
             }
             lexemeType = NUMBER;
+            unaryOperator = ' ';
         }
         else if (Character.isLetter(expression.charAt(currentIndex))) {
-            while(!isDelimiter(expression.charAt(currentIndex))) {
+            while (!isDelimiter(expression.charAt(currentIndex))) {
                 lexeme += expression.charAt(currentIndex);
                 currentIndex++;
-                if(currentIndex >= expression.length()) {
+                if (currentIndex >= expression.length()) {
                     break;
                 }
             }
@@ -250,7 +272,7 @@ public class StringParser {
         Queue<Integer> variablesValueQueue = new LinkedList<>();
         Collections.addAll(variablesValueQueue, variablesValue);
 
-        while(true) {
+        while (true) {
             getLexeme();
             if (lexemeType.equals(VARIABLE)) {
                 if (variablesValueQueue.peek() != null) {
@@ -266,6 +288,7 @@ public class StringParser {
                     lexeme = "";
                     lexemeType = "";
                     currentIndex = 0;
+                    unaryOperator = ' ';
                     break;
                 }
                 else {
