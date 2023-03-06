@@ -5,7 +5,7 @@ import java.text.ParseException;
 public class TestCalculator {
     public static void main(String[] args) {
         double stringResult;
-        StringParser stringParser = new StringParser("(2 - -1) * -x1");
+        StringParser stringParser = new StringParser("(cos(5) - -1) * -x1");
         try {
             stringParser.setVariablesValue(2);
             stringResult = stringParser.getExpressionResult();
