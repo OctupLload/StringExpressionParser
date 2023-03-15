@@ -1,5 +1,7 @@
 package com.calculator.parser;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -69,9 +71,19 @@ public class StringParser {
     private char unaryOperator;
 
     /**
+     * Аргументы функции
+     */
+    private String functionArguments;
+
+    /**
      * Результат вычисления функции
      */
     private double functionValue;
+
+    /**
+     * Объект класса, который вызвал библиотеку
+     */
+    private Object classWhoCalledLibrary;
 
     /**
      * Конструктор - создание нового объекта с определенным значением
@@ -203,6 +215,7 @@ public class StringParser {
     private void getLexeme(){
         lexemeType = NONE;
         lexeme = "";
+        functionArguments = "";
         if (currentIndex == expression.length()) {
             lexeme = EOE;
             return;
@@ -243,17 +256,21 @@ public class StringParser {
             while (!isDelimiter(expression.charAt(currentIndex))) {
                 lexeme += expression.charAt(currentIndex);
                 currentIndex++;
-                if (currentIndex >= expression.length()) {
+                if (currentIndex >= expression.length() -1) {
                     break;
                 }
             }
-            if (mathFunctions.contains(lexeme) && expression.charAt(currentIndex) == '(') {
-                while(!(expression.charAt(currentIndex) == ')')) {
-                    lexeme += expression.charAt(currentIndex);
+            if (expression.charAt(currentIndex) == '(') {
+                currentIndex++;
+                while (!(expression.charAt(currentIndex) == ')')) {
+                    functionArguments += expression.charAt(currentIndex);
                     currentIndex++;
                 }
-                lexeme += expression.charAt(currentIndex);
-                lexeme = replaceFunction(lexeme);
+                if (mathFunctions.contains(lexeme)) {
+                    lexeme = getResultMathFunction(lexeme, functionArguments);
+                } else {
+                    lexeme = getResultClientFunction(lexeme, functionArguments);
+                }
                 lexemeType = NUMBER;
             }
             else {
@@ -270,22 +287,77 @@ public class StringParser {
      * @param lexeme функция для вычисления и замены
      * @return результат вычисления функции
      */
-    private String replaceFunction(String lexeme) {
-        String functionName = lexeme.substring(0, lexeme.indexOf('('));
-        String functionArgument = lexeme.substring(lexeme.indexOf('(') + 1, lexeme.indexOf(')'));
-
-        switch (functionName) {
-            case "tan" -> functionValue = Math.tan(Double.parseDouble(functionArgument));
-            case "sin" -> functionValue = Math.sin(Double.parseDouble(functionArgument));
-            case "cos" -> functionValue = Math.cos(Double.parseDouble(functionArgument));
+    private String getResultMathFunction(String lexeme, String functionArguments) {
+        String lexemeWithFunctionArguments;
+        switch (lexeme) {
+            case "tan" -> functionValue = Math.tan(Double.parseDouble(functionArguments));
+            case "sin" -> functionValue = Math.sin(Double.parseDouble(functionArguments));
+            case "cos" -> functionValue = Math.cos(Double.parseDouble(functionArguments));
         }
 
         functionValue = (double) Math.round(functionValue * 100) / 100;
-        this.expression = expression.replace(lexeme, Double.toString(functionValue));
+        lexemeWithFunctionArguments = lexeme + "(" + functionArguments + ")";
+        this.expression = expression.replace(lexemeWithFunctionArguments, Double.toString(functionValue));
 
-        this.currentIndex = currentIndex - (lexeme.length() - Double.toString(functionValue).length()) + 1;
+        this.currentIndex = currentIndex - (lexemeWithFunctionArguments.length() - Double.toString(functionValue).length()) + 1;
 
         return Double.toString(functionValue);
+    }
+    /**
+     * Замена пользовательской функции на результат ее вычисления
+     * @param lexeme функция для вычисления и замены
+     * @return результат вычисления пользовательской функции
+     */
+    private String getResultClientFunction (String lexeme, String functionArguments) {
+        String resultClientFunction = "";
+        String[] splitedFunctionArguments;
+        Method clientFunction = null;
+        Method[] clientMethods;
+        Object[] clientFunctionArgs;
+        String lexemeWithFunctionArguments;
+        if (functionArguments.length() == 0 || classWhoCalledLibrary == null) {
+            return resultClientFunction = lexeme;
+        }
+        else {
+            splitedFunctionArguments = functionArguments.split(",");
+            clientFunctionArgs = new Object[splitedFunctionArguments.length];
+        }
+
+        for (int i = 0; i < splitedFunctionArguments.length; i++) {
+            clientFunctionArgs[i] = Integer.parseInt(splitedFunctionArguments[i]);
+        }
+
+        clientMethods = classWhoCalledLibrary.getClass().getMethods();
+
+        for (Method method: clientMethods) {
+            if (method.getName().equals(lexeme) &&
+                    method.getParameterTypes().length == clientFunctionArgs.length) {
+                clientFunction = method;
+            }
+        }
+
+        if (clientFunction != null) {
+            try {
+                resultClientFunction = Integer.toString((Integer) clientFunction.invoke(classWhoCalledLibrary, clientFunctionArgs));
+            } catch (IllegalAccessException | InvocationTargetException exception) {
+                System.out.println("Ошибка при получении или вычислении пользовательской функции.");
+            }
+            lexemeWithFunctionArguments = lexeme + "(" + functionArguments + ")";
+            this.expression = expression.replace(lexemeWithFunctionArguments, resultClientFunction);
+            this.currentIndex = currentIndex - (lexemeWithFunctionArguments.length() - resultClientFunction.length()) + 1;
+        }
+        else {
+            resultClientFunction = lexeme;
+        }
+        return resultClientFunction;
+    }
+
+    /**
+     * Установка объекта класса в котором вызывается библиотека
+     * @param classWhoCalledLibrary объект класса в котором вызывается библиотека
+     */
+    public void setClassWhoCalledLibrary (Object classWhoCalledLibrary) {
+        this.classWhoCalledLibrary = classWhoCalledLibrary;
     }
 
     /**

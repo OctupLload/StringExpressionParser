@@ -105,6 +105,22 @@ class StringParserTest {
             assertThat(actualResult).as("Неверный результат при наличии математической функции")
                                     .isEqualTo(1.02);
         }
+
+        @Test
+        void evaluateWithClientFunction() throws ParseException {
+            StringParser stringParser = new StringParser("myFunction(5) + 10");
+            EvaluateTest evaluateTest = new EvaluateTest();
+
+            stringParser.setClassWhoCalledLibrary(evaluateTest);
+            double actualResult = stringParser.getExpressionResult();
+
+            assertThat(actualResult).as("Неверный результат при наличии клиентской функции")
+                    .isEqualTo(35.0);
+        }
+
+        public int myFunction(int paramOne) {
+            return paramOne * 5;
+        }
     }
 
     @Nested
