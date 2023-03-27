@@ -114,7 +114,8 @@ public class MathStringExpressionParser {
                     if (mathFunctions.contains(getFunctionNameFromOperand(operand))) {
                         operand = getMathFunctionResult(operand);
                     }
-                    else if (stringExpression.getClientFunctions().containsKey(getFunctionNameFromOperand(operand))) {
+                    else if (stringExpression.getClientFunctionsWithOneArgument().containsKey(getFunctionNameFromOperand(operand)) ||
+                             stringExpression.getClientFunctionsWithTwoArguments().containsKey(getFunctionNameFromOperand(operand))) {
                         operand = getClientFunctionResult(operand);
                     }
                     else {
@@ -193,7 +194,8 @@ public class MathStringExpressionParser {
             }
             else if (!variable.isEmpty()) {
                 if (mathFunctions.contains(variable) ||
-                    stringExpression.getClientFunctions().containsKey(variable)) {
+                    stringExpression.getClientFunctionsWithOneArgument().containsKey(variable) ||
+                    stringExpression.getClientFunctionsWithTwoArguments().containsKey(variable)) {
                     expressionWithSettedVariablesValue += variable;
                 }
                 else if (variablesValueQueue.peek() != null) {
@@ -328,11 +330,16 @@ public class MathStringExpressionParser {
         double functionValue = 0.0;
 
         if (functionArguments.length == 1) {
-            functionValue = stringExpression.getClientFunctions()
+            functionValue = stringExpression.getClientFunctionsWithOneArgument()
                                             .get(functionName)
                                             .apply(Double.parseDouble(functionArguments[0]));
         }
-
+        else if (functionArguments.length == 2) {
+            functionValue = stringExpression.getClientFunctionsWithTwoArguments()
+                                            .get(functionName)
+                                            .apply(Double.parseDouble(functionArguments[0]),
+                                                   Double.parseDouble(functionArguments[0]));
+        }
         functionValue = (double) Math.round(functionValue * 100) / 100;
 
         return Double.toString(functionValue);
