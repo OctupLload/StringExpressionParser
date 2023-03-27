@@ -1,4 +1,4 @@
-package com.calculator.parser;
+package com.calculator.parser.Entities;
 
 import java.util.HashMap;
 import java.util.Map;

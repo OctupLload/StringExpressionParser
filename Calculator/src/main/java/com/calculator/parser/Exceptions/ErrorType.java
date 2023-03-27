@@ -1,4 +1,4 @@
-package com.calculator.parser;
+package com.calculator.parser.Exceptions;
 
 /**
  * Класс-перечисление возможных ошибок
@@ -7,7 +7,8 @@ public enum ErrorType {
     NO_EXPRESSION_ERROR("Отсутствует выражение"),
     DIVISION_BY_ZERO_ERROR("Обнаружено деление на ноль"),
     VARIABLE_DETECTED_ERROR("Обнаружена переменная без значения"),
-    INCORRECT_VARIABLES_QUANTITY_ERROR("Количество значений больше количества переменных");
+    INCORRECT_VARIABLES_QUANTITY_ERROR("Количество значений больше количества переменных"),
+    INCORRECT_NUMBER_TYPE("Неверный тип чисел в выражении");
 
     /**
      * Описание ошибки

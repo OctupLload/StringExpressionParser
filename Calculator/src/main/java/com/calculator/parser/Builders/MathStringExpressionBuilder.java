@@ -1,4 +1,6 @@
-package com.calculator.parser;
+package com.calculator.parser.Builders;
+
+import com.calculator.parser.Entities.StringExpression;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
