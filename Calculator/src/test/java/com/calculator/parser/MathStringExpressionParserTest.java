@@ -101,25 +101,52 @@ class MathStringExpressionParserTest {
 
             double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
 
-            assertThat(actualResult).as("Неверный результат при наличии математической функции")
+            assertThat(actualResult).as("Неверный результат при наличии математической функции с одним аргументом")
                                     .isEqualTo(-2.89);
         }
 
         @Test
         void evaluateWithClientFunctionWhereOneArgument() {
             StringExpression stringExpression = new MathStringExpressionBuilder("10 + myFun(2)")
-                                                        .setClientFunction("myFun", EvaluateTest::myFun)
+                                                        .setClientFunctionWithOneArgument("myFun", EvaluateTest::myFun)
                                                         .build();
 
             double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
 
-            assertThat(actualResult).as("Неверный результат при наличии клиентской функции")
+            assertThat(actualResult).as("Неверный результат при наличии клиентской функции с одним аргументом")
                                     .isEqualTo(20);
         }
 
         public static double myFun(double param) {
             return param * 5;
         }
+
+        @Test
+        void evaluateWithMathFunctionsWhereTwoArguments() {
+            StringExpression stringExpression = new MathStringExpressionBuilder("min(10,3) + pow(5,2) + max(4,5)").build();
+
+            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+
+            assertThat(actualResult).as("Неверный результат при наличии математической функции c двумя аргументами")
+                                    .isEqualTo(33);
+        }
+
+        @Test
+        void evaluateWithClientFunctionWhereTwoArguments() {
+            StringExpression stringExpression = new MathStringExpressionBuilder("10 + myFun(5, 5)")
+                    .setClientFunctionWithTwoArguments("myFun", EvaluateTest::myFun)
+                    .build();
+
+            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+
+            assertThat(actualResult).as("Неверный результат при наличии клиентской функции с двумя аргументами")
+                                    .isEqualTo(20);
+        }
+
+        public static double myFun(double paramOne, double paramTwo) {
+            return paramOne + paramTwo;
+        }
+
     }
 
     @Nested
