@@ -1,15 +1,15 @@
-import com.calculator.parser.MathStringExpressionBuilder;
-import com.calculator.parser.MathStringExpressionParser;
-import com.calculator.parser.StringExpression;
+import com.calculator.parser.builders.MathStringExpressionBuilder;
+import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.parsers.math.IntMathStringExpressionParser;
 
 public class TestCalculator {
     public static void main(String[] args) {
-        double result;
+        int result;
         StringExpression stringExpression = new MathStringExpressionBuilder("(cos(5) - -1) * x1 + myFun(10) + myFunTwo(2, 2)")
                                                             .setClientFunctionWithOneArgument("myFun",TestCalculator::myFun)
                                                             .setClientFunctionWithTwoArguments("myFunTwo", TestCalculator::myFunTwo)
                                                             .build();
-        MathStringExpressionParser mathStringExpressionParser = new MathStringExpressionParser(stringExpression);
+        IntMathStringExpressionParser mathStringExpressionParser = new IntMathStringExpressionParser(stringExpression);
         mathStringExpressionParser.setVariablesValue(2);
         result = mathStringExpressionParser.getExpressionResult();
 

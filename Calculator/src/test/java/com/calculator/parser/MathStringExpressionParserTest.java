@@ -1,5 +1,10 @@
 package com.calculator.parser;
 
+import com.calculator.parser.builders.MathStringExpressionBuilder;
+import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.exceptions.ParserException;
+import com.calculator.parser.parsers.math.DoubleMathStringExpressionParser;
+import com.calculator.parser.parsers.math.IntMathStringExpressionParser;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +18,7 @@ class MathStringExpressionParserTest {
         void evaluateWithAdd() {
             StringExpression stringExpression = new MathStringExpressionBuilder("2 +2").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при сложении").isEqualTo(4);
         }
@@ -22,7 +27,7 @@ class MathStringExpressionParserTest {
         void evaluateWithSubstract() {
             StringExpression stringExpression = new MathStringExpressionBuilder("20- 4").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при вычитании").isEqualTo(16);
         }
@@ -31,7 +36,7 @@ class MathStringExpressionParserTest {
         void evaluateWithAddAndSubstract() {
             StringExpression stringExpression = new MathStringExpressionBuilder("20- 4 + 5 - 10").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при сложении и вычитании").isEqualTo(11);
         }
@@ -40,7 +45,7 @@ class MathStringExpressionParserTest {
         void evaluateWithMultiply() {
             StringExpression stringExpression = new MathStringExpressionBuilder("5 * 2 *9").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при умножении").isEqualTo(90);
         }
@@ -49,16 +54,16 @@ class MathStringExpressionParserTest {
         void evaluateWithDivide() {
             StringExpression stringExpression = new MathStringExpressionBuilder("13 / 4 ").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
-            assertThat(actualResult).as("Неверный результат при делении").isEqualTo(3.25);
+            assertThat(actualResult).as("Неверный результат при делении").isEqualTo(3);
         }
 
         @Test
         void evaluateWithMultiplyAndDivide() {
             StringExpression stringExpression = new MathStringExpressionBuilder("15*20/2 ").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат умножении и делении").isEqualTo(150);
         }
@@ -67,7 +72,7 @@ class MathStringExpressionParserTest {
         void evaluateWithAllOperators() {
             StringExpression stringExpression = new MathStringExpressionBuilder("(2 + 2) * 2 / 2 - 1").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неправильное вычисление с наличием всех операторов и скобок")
                                     .isEqualTo(3);
@@ -76,8 +81,8 @@ class MathStringExpressionParserTest {
         @Test
         void evaluateWithVariables() {
             StringExpression stringExpression = new MathStringExpressionBuilder("x1 + 6 / x2").build();
-            MathStringExpressionParser mathStringExpressionParser = new MathStringExpressionParser(stringExpression);
-            mathStringExpressionParser.setVariablesValue(4, 3);
+            DoubleMathStringExpressionParser mathStringExpressionParser = new DoubleMathStringExpressionParser(stringExpression);
+            mathStringExpressionParser.setVariablesValue(4.0, 3.0);
 
             double actualResult = mathStringExpressionParser.getExpressionResult();
 
@@ -89,7 +94,7 @@ class MathStringExpressionParserTest {
         void evaluateWithUnaryOperators() {
             StringExpression stringExpression = new MathStringExpressionBuilder("-2 - -2").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неправильное вычисление с наличием всех операторов и скобок")
                                     .isEqualTo(0);
@@ -99,10 +104,10 @@ class MathStringExpressionParserTest {
         void evaluateWithMathFunctionsWhereOneArgument() {
             StringExpression stringExpression = new MathStringExpressionBuilder("cos(10) + tan(2) + sin(3)").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при наличии математической функции с одним аргументом")
-                                    .isEqualTo(-2.89);
+                                    .isEqualTo(-3);
         }
 
         @Test
@@ -111,7 +116,7 @@ class MathStringExpressionParserTest {
                                                         .setClientFunctionWithOneArgument("myFun", EvaluateTest::myFun)
                                                         .build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при наличии клиентской функции с одним аргументом")
                                     .isEqualTo(20);
@@ -125,7 +130,7 @@ class MathStringExpressionParserTest {
         void evaluateWithMathFunctionsWhereTwoArguments() {
             StringExpression stringExpression = new MathStringExpressionBuilder("min(10,3) + pow(5,2) + max(4,5)").build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при наличии математической функции c двумя аргументами")
                                     .isEqualTo(33);
@@ -137,7 +142,7 @@ class MathStringExpressionParserTest {
                     .setClientFunctionWithTwoArguments("myFun", EvaluateTest::myFun)
                     .build();
 
-            double actualResult = new MathStringExpressionParser(stringExpression).getExpressionResult();
+            double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
             assertThat(actualResult).as("Неверный результат при наличии клиентской функции с двумя аргументами")
                                     .isEqualTo(20);
@@ -155,7 +160,7 @@ class MathStringExpressionParserTest {
         void noExpressionError() {
             StringExpression stringExpression = new MathStringExpressionBuilder("").build();
 
-            Throwable actualException = catchThrowable(new MathStringExpressionParser(stringExpression)::getExpressionResult);
+            Throwable actualException = catchThrowable(new IntMathStringExpressionParser(stringExpression)::getExpressionResult);
 
             assertThat(actualException).as("Исключение не сгенерировано")
                                        .isNotNull()
@@ -168,7 +173,7 @@ class MathStringExpressionParserTest {
         void divisionByZeroError() {
             StringExpression stringExpression = new MathStringExpressionBuilder("10 * 2 / 0").build();
 
-            Throwable actualException = catchThrowable(new MathStringExpressionParser(stringExpression)::getExpressionResult);
+            Throwable actualException = catchThrowable(new IntMathStringExpressionParser(stringExpression)::getExpressionResult);
 
             assertThat(actualException).as("Исключение не сгенерировано")
                                        .isNotNull()
@@ -181,7 +186,7 @@ class MathStringExpressionParserTest {
         void variableDetectedError() {
             StringExpression stringExpression = new MathStringExpressionBuilder("(25 +3) * x1").build();
 
-            Throwable actualException = catchThrowable(new MathStringExpressionParser(stringExpression)::getExpressionResult);
+            Throwable actualException = catchThrowable(new IntMathStringExpressionParser(stringExpression)::getExpressionResult);
 
             assertThat(actualException).as("Исключение не сгенерировано")
                                        .isNotNull()
@@ -193,8 +198,8 @@ class MathStringExpressionParserTest {
         @Test
         void incorrectVariablesQuantityError() {
             StringExpression stringExpression = new MathStringExpressionBuilder("x1 + 25 *x2").build();
-            MathStringExpressionParser mathStringExpressionParser = new MathStringExpressionParser(stringExpression);
-            Throwable actualException = catchThrowable(() -> mathStringExpressionParser.setVariablesValue(1, 2, 3));
+            IntMathStringExpressionParser intMathStringExpressionParser = new IntMathStringExpressionParser(stringExpression);
+            Throwable actualException = catchThrowable(() -> intMathStringExpressionParser.setVariablesValue(1, 2, 3));
 
             assertThat(actualException).as("Исключение не сгенерировано")
                                        .isNotNull()
