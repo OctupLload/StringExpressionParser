@@ -1,47 +1,44 @@
-package com.calculator.parser.Parsers.Math;
+package com.calculator.parser.parsers.math;
 
-import com.calculator.parser.Entities.StringExpression;
-import com.calculator.parser.Exceptions.ErrorType;
-import com.calculator.parser.Exceptions.ParserException;
+import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.exceptions.ErrorType;
+import com.calculator.parser.exceptions.ParserException;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Парсер целочисленного математического выражения с использованием обратной польской нотации
+ * Парсер вещественных велечин с использованием обратной польской нотации
  */
-public class IntMathStringExpressionParser extends MathStringExpressionParser<Integer> {
+public class DoubleMathStringExpressionParser extends MathStringExpressionParser<Double> {
 
     /**
      * Конструктор - создание нового объекта парсера с заданием объекта строкового выражения
      * @param stringExpression заполненный объект строкового выражения
      */
-    public IntMathStringExpressionParser(StringExpression stringExpression) {
+    public DoubleMathStringExpressionParser(StringExpression stringExpression) {
         super(stringExpression);
     }
 
-    /**
-     * Получить результат выражения
-     * @return результат выражения
-     */
-    public Integer getExpressionResult() {
+    @Override
+    public Double getExpressionResult() {
         if (stringExpression.getExpression().isEmpty()) {
             throw new ParserException(ErrorType.NO_EXPRESSION_ERROR);
         }
-        if (!validateOperandTypeInExpression(stringExpression.getExpression())) {
+        if (validateOperandTypeInExpression(stringExpression.getExpression())) {
             throw new ParserException(ErrorType.INCORRECT_NUMBER_TYPE);
         }
         String expressionInReversePolishNotation = expressionToReversePolishNotation(stringExpression.getExpression());
-        return Math.toIntExact(Math.round(expressionInReversePolishNotationToResult(expressionInReversePolishNotation)));
+        return (double) Math.round(expressionInReversePolishNotationToResult(expressionInReversePolishNotation) * 100) / 100;
     }
 
     @Override
-    public void setVariablesValue(Integer... variablesValue) {
+    public void setVariablesValue(Double... variablesValue) {
         String expression = stringExpression.getExpression();
         String expressionWithSettedVariablesValue = "";
         String variable = "";
-        Queue<Integer> variablesValueQueue = new LinkedList<>();
+        Queue<Double> variablesValueQueue = new LinkedList<>();
         Collections.addAll(variablesValueQueue, variablesValue);
 
         for (int token = 0; token < expression.length(); token++) {
@@ -59,7 +56,7 @@ public class IntMathStringExpressionParser extends MathStringExpressionParser<In
                     expressionWithSettedVariablesValue += variable;
                 }
                 else if (variablesValueQueue.peek() != null) {
-                    expressionWithSettedVariablesValue += Integer.toString(variablesValueQueue.poll());
+                    expressionWithSettedVariablesValue += Double.toString(variablesValueQueue.poll());
                     if (token != expression.length() - 1) {
                         expressionWithSettedVariablesValue += symbol;
                     }

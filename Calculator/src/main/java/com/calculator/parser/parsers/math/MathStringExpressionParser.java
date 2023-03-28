@@ -1,9 +1,9 @@
-package com.calculator.parser.Parsers.Math;
+package com.calculator.parser.parsers.math;
 
-import com.calculator.parser.Exceptions.ErrorType;
-import com.calculator.parser.Exceptions.ParserException;
-import com.calculator.parser.Entities.StringExpression;
-import com.calculator.parser.Parsers.StringExpressionParser;
+import com.calculator.parser.exceptions.ErrorType;
+import com.calculator.parser.exceptions.ParserException;
+import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.parsers.StringExpressionParser;
 
 import java.util.List;
 import java.util.Stack;

@@ -1,4 +1,4 @@
-package com.calculator.parser.Exceptions;
+package com.calculator.parser.exceptions;
 
 /**
  * Класс-перечисление возможных ошибок

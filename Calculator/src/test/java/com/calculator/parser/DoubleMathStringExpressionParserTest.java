@@ -1,9 +1,9 @@
 package com.calculator.parser;
 
-import com.calculator.parser.Builders.MathStringExpressionBuilder;
-import com.calculator.parser.Entities.StringExpression;
-import com.calculator.parser.Exceptions.ParserException;
-import com.calculator.parser.Parsers.Math.DoubleMathStringExpressionParser;
+import com.calculator.parser.builders.MathStringExpressionBuilder;
+import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.exceptions.ParserException;
+import com.calculator.parser.parsers.math.DoubleMathStringExpressionParser;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

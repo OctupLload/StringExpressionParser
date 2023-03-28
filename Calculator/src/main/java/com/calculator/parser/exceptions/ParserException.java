@@ -1,4 +1,4 @@
-package com.calculator.parser.Exceptions;
+package com.calculator.parser.exceptions;
 
 /**
  * Исключение при вычислении выражения

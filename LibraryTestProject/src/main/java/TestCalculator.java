@@ -1,6 +1,6 @@
-import com.calculator.parser.Builders.MathStringExpressionBuilder;
-import com.calculator.parser.Entities.StringExpression;
-import com.calculator.parser.Parsers.Math.IntMathStringExpressionParser;
+import com.calculator.parser.builders.MathStringExpressionBuilder;
+import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.parsers.math.IntMathStringExpressionParser;
 
 public class TestCalculator {
     public static void main(String[] args) {

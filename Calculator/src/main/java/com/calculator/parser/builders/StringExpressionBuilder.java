@@ -1,6 +1,6 @@
-package com.calculator.parser.Builders;
+package com.calculator.parser.builders;
 
-import com.calculator.parser.Entities.StringExpression;
+import com.calculator.parser.entities.StringExpression;
 
 /**
  * Построитель строкового выражения

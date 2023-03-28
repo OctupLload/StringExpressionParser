@@ -1,6 +1,6 @@
-package com.calculator.parser.Parsers;
+package com.calculator.parser.parsers;
 
-import com.calculator.parser.Entities.StringExpression;
+import com.calculator.parser.entities.StringExpression;
 
 import java.util.Stack;
 
