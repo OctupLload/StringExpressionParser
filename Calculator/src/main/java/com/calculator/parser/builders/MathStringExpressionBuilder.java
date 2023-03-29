@@ -1,6 +1,6 @@
 package com.calculator.parser.builders;
 
-import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.entities.MathStringExpression;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -8,14 +8,14 @@ import java.util.function.Function;
 /**
  * Построитель математического стрового выражения
  */
-public class MathStringExpressionBuilder extends StringExpressionBuilder {
+public class MathStringExpressionBuilder extends StringExpressionBuilder<MathStringExpression> {
 
     /**
      * Конструктор - создание нового объекта строкового выражения
      * @param expression строковое выражение
      */
     public MathStringExpressionBuilder(String expression) {
-        stringExpression = new StringExpression(expression);
+        stringExpression = new MathStringExpression(expression);
     }
 
     /**

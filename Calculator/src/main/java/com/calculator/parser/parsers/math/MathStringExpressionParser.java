@@ -1,8 +1,8 @@
 package com.calculator.parser.parsers.math;
 
+import com.calculator.parser.entities.MathStringExpression;
 import com.calculator.parser.exceptions.ErrorType;
 import com.calculator.parser.exceptions.ParserException;
-import com.calculator.parser.entities.StringExpression;
 import com.calculator.parser.parsers.StringExpressionParser;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Stack;
 /**
  * Парсер математических выражений с использованием обратной польской нотации
  */
-public abstract class MathStringExpressionParser<T> extends StringExpressionParser {
+public abstract class MathStringExpressionParser<T> extends StringExpressionParser<MathStringExpression> {
 
     /**
      * Допустимые математические функции
@@ -22,7 +22,7 @@ public abstract class MathStringExpressionParser<T> extends StringExpressionPars
      * Конструктор - создание нового объекта парсера с заданием объекта строкового выражения
      * @param stringExpression заполненный объект строкового выражения
      */
-    public MathStringExpressionParser(StringExpression stringExpression) {
+    public MathStringExpressionParser(MathStringExpression stringExpression) {
         super(stringExpression);
     }
 
@@ -37,7 +37,7 @@ public abstract class MathStringExpressionParser<T> extends StringExpressionPars
      * @param expressionInReversePolishNotation строковое выражение в обратной польской нотации
      * @return значение строкового выражения
      */
-    protected double expressionInReversePolishNotationToResult(String expressionInReversePolishNotation) {
+    protected String expressionInReversePolishNotationToResult(String expressionInReversePolishNotation) {
         String operand = "";
         Stack<Double> operandStack = new Stack<>();
 
@@ -91,7 +91,7 @@ public abstract class MathStringExpressionParser<T> extends StringExpressionPars
                 }
             }
         }
-        return operandStack.pop();
+        return Double.toString(operandStack.pop());
     }
 
     /**

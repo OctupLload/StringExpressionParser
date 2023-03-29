@@ -8,7 +8,8 @@ public enum ErrorType {
     DIVISION_BY_ZERO_ERROR("Обнаружено деление на ноль"),
     VARIABLE_DETECTED_ERROR("Обнаружена переменная без значения"),
     INCORRECT_VARIABLES_QUANTITY_ERROR("Количество значений больше количества переменных"),
-    INCORRECT_NUMBER_TYPE("Неверный тип чисел в выражении");
+    INCORRECT_NUMBER_TYPE("Неверный тип чисел в выражении"),
+    INCORRECT_LOGIC_TYPE("Неверный тип логических значений в выражении");
 
     /**
      * Описание ошибки

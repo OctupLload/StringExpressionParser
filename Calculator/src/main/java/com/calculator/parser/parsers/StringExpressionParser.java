@@ -1,23 +1,22 @@
 package com.calculator.parser.parsers;
 
-import com.calculator.parser.entities.StringExpression;
-
 import java.util.Stack;
 
 /**
  * Парсер строковых выражений с использованием обратной польской нотации
  */
-public abstract class StringExpressionParser {
+public abstract class StringExpressionParser<T> {
+
     /**
      * Объект строкового выражения
      */
-    protected final StringExpression stringExpression;
+    protected final T stringExpression;
 
     /**
      * Конструктор - создание нового объекта парсера с заданием объекта строкового выражения
      * @param stringExpression заполненный объект строкового выражения
      */
-    public StringExpressionParser(StringExpression stringExpression) {
+    public StringExpressionParser(T stringExpression) {
         this.stringExpression = stringExpression;
     }
 
@@ -33,7 +32,7 @@ public abstract class StringExpressionParser {
      * @param expressionInReversePolishNotation выражение в обратной польской нотации
      * @return результат выражения
      */
-    protected abstract double expressionInReversePolishNotationToResult(String expressionInReversePolishNotation);
+    protected abstract String expressionInReversePolishNotationToResult(String expressionInReversePolishNotation);
 
     /**
      * Проверить выражение на наличие неверного типа операнда
