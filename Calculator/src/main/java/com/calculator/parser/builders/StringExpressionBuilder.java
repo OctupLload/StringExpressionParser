@@ -1,21 +1,19 @@
 package com.calculator.parser.builders;
 
-import com.calculator.parser.entities.StringExpression;
-
 /**
  * Построитель строкового выражения
  */
-public abstract class StringExpressionBuilder {
+public abstract class StringExpressionBuilder<T> {
     /**
      * Объект строкового выражения
      */
-    StringExpression stringExpression;
+    T stringExpression;
 
     /**
      * Сборка строкового выражения
-     * @return строковое выражение
+     * @return объект строкового выражение
      */
-    public StringExpression build() {
+    public T build() {
         return stringExpression;
     }
 }

@@ -1,6 +1,6 @@
 package com.calculator.parser.parsers.math;
 
-import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.entities.MathStringExpression;
 import com.calculator.parser.exceptions.ErrorType;
 import com.calculator.parser.exceptions.ParserException;
 
@@ -17,7 +17,7 @@ public class DoubleMathStringExpressionParser extends MathStringExpressionParser
      * Конструктор - создание нового объекта парсера с заданием объекта строкового выражения
      * @param stringExpression заполненный объект строкового выражения
      */
-    public DoubleMathStringExpressionParser(StringExpression stringExpression) {
+    public DoubleMathStringExpressionParser(MathStringExpression stringExpression) {
         super(stringExpression);
     }
 
@@ -30,7 +30,7 @@ public class DoubleMathStringExpressionParser extends MathStringExpressionParser
             throw new ParserException(ErrorType.INCORRECT_NUMBER_TYPE);
         }
         String expressionInReversePolishNotation = expressionToReversePolishNotation(stringExpression.getExpression());
-        return (double) Math.round(expressionInReversePolishNotationToResult(expressionInReversePolishNotation) * 100) / 100;
+        return (double) Math.round(Double.parseDouble(expressionInReversePolishNotationToResult(expressionInReversePolishNotation)) * 100) / 100;
     }
 
     @Override

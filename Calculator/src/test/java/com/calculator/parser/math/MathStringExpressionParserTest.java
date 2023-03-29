@@ -1,7 +1,7 @@
-package com.calculator.parser;
+package com.calculator.parser.math;
 
 import com.calculator.parser.builders.MathStringExpressionBuilder;
-import com.calculator.parser.entities.StringExpression;
+import com.calculator.parser.entities.MathStringExpression;
 import com.calculator.parser.exceptions.ParserException;
 import com.calculator.parser.parsers.math.DoubleMathStringExpressionParser;
 import com.calculator.parser.parsers.math.IntMathStringExpressionParser;
@@ -16,7 +16,7 @@ class MathStringExpressionParserTest {
     class EvaluateTest {
         @Test
         void evaluateWithAdd() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("2 +2").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("2 +2").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -25,7 +25,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithSubstract() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("20- 4").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("20- 4").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -34,7 +34,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithAddAndSubstract() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("20- 4 + 5 - 10").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("20- 4 + 5 - 10").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -43,7 +43,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithMultiply() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("5 * 2 *9").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("5 * 2 *9").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -52,7 +52,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithDivide() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("13 / 4 ").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("13 / 4 ").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -61,7 +61,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithMultiplyAndDivide() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("15*20/2 ").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("15*20/2 ").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -70,7 +70,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithAllOperators() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("(2 + 2) * 2 / 2 - 1").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("(2 + 2) * 2 / 2 - 1").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -80,7 +80,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithVariables() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("x1 + 6 / x2").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("x1 + 6 / x2").build();
             DoubleMathStringExpressionParser mathStringExpressionParser = new DoubleMathStringExpressionParser(stringExpression);
             mathStringExpressionParser.setVariablesValue(4.0, 3.0);
 
@@ -92,7 +92,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithUnaryOperators() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("-2 - -2").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("-2 - -2").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -102,7 +102,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithMathFunctionsWhereOneArgument() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("cos(10) + tan(2) + sin(3)").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("cos(10) + tan(2) + sin(3)").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -112,7 +112,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithClientFunctionWhereOneArgument() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("10 + myFun(2)")
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("10 + myFun(2)")
                                                         .setClientFunctionWithOneArgument("myFun", EvaluateTest::myFun)
                                                         .build();
 
@@ -128,7 +128,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithMathFunctionsWhereTwoArguments() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("min(10,3) + pow(5,2) + max(4,5)").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("min(10,3) + pow(5,2) + max(4,5)").build();
 
             double actualResult = new IntMathStringExpressionParser(stringExpression).getExpressionResult();
 
@@ -138,7 +138,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void evaluateWithClientFunctionWhereTwoArguments() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("10 + myFun(5, 5)")
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("10 + myFun(5, 5)")
                     .setClientFunctionWithTwoArguments("myFun", EvaluateTest::myFun)
                     .build();
 
@@ -158,7 +158,7 @@ class MathStringExpressionParserTest {
     class ErrorTest {
         @Test
         void noExpressionError() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("").build();
 
             Throwable actualException = catchThrowable(new IntMathStringExpressionParser(stringExpression)::getExpressionResult);
 
@@ -171,7 +171,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void divisionByZeroError() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("10 * 2 / 0").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("10 * 2 / 0").build();
 
             Throwable actualException = catchThrowable(new IntMathStringExpressionParser(stringExpression)::getExpressionResult);
 
@@ -184,7 +184,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void variableDetectedError() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("(25 +3) * x1").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("(25 +3) * x1").build();
 
             Throwable actualException = catchThrowable(new IntMathStringExpressionParser(stringExpression)::getExpressionResult);
 
@@ -197,7 +197,7 @@ class MathStringExpressionParserTest {
 
         @Test
         void incorrectVariablesQuantityError() {
-            StringExpression stringExpression = new MathStringExpressionBuilder("x1 + 25 *x2").build();
+            MathStringExpression stringExpression = new MathStringExpressionBuilder("x1 + 25 *x2").build();
             IntMathStringExpressionParser intMathStringExpressionParser = new IntMathStringExpressionParser(stringExpression);
             Throwable actualException = catchThrowable(() -> intMathStringExpressionParser.setVariablesValue(1, 2, 3));
 
