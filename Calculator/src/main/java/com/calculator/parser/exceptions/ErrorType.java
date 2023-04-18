@@ -9,7 +9,8 @@ public enum ErrorType {
     VARIABLE_DETECTED_ERROR("Обнаружена переменная без значения"),
     INCORRECT_VARIABLES_QUANTITY_ERROR("Количество значений больше количества переменных"),
     INCORRECT_NUMBER_TYPE("Неверный тип чисел в выражении"),
-    INCORRECT_LOGIC_TYPE("Неверный тип логических значений в выражении");
+    INCORRECT_LOGIC_TYPE("Неверный тип логических значений в выражении"),
+    INCORRECT_VARIABLE_VALUE_TYPE("Неверный тип значения переменной");
 
     /**
      * Описание ошибки
